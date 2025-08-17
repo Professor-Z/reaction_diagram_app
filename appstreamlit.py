@@ -375,13 +375,14 @@ st.markdown("""
 Use the control buttons below the graph to toggle different features and save curves for comparison.
 """)
 
-# Energy control sliders at the top
-st.markdown("### Energy Controls")
+# Energy control sliders in the sidebar
+with st.sidebar:
+    st.markdown("### Energy Controls")
 
-# Create three columns for sliders
-slider_col1, slider_col2, slider_col3 = st.columns(3)
-
-with slider_col1:
+# Energy control sliders in the sidebar
+with st.sidebar:
+    st.markdown("### Energy Controls")
+    
     if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
         new_reactant = st.slider(
             "Reactant Energy",
@@ -398,7 +399,6 @@ with slider_col1:
     else:
         st.write(f"Reactant Energy: {st.session_state.reactant_energy:.1f} (Fixed in mode)")
 
-with slider_col2:
     if st.session_state.endothermic_mode:
         new_product = st.slider(
             "Product Energy",
@@ -441,7 +441,6 @@ with slider_col2:
         update_hammond_postulate()
         st.rerun()
 
-with slider_col3:
     if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
         min_peak = max(st.session_state.reactant_energy, st.session_state.product_energy) + 0.1
         new_peak = st.slider(
@@ -464,8 +463,19 @@ fig = create_interactive_plot()
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
 
-# Control buttons below the graph
-st.markdown("### Control Options")
+
+# Custom CSS to adjust sidebar width
+st.markdown(
+    """
+    <style>
+    .stSidebar {
+        width: 300px; /* Adjust the width as needed */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Control buttons in columns
 col1, col2, col3, col4, col5 = st.columns(5)
