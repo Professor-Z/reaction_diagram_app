@@ -403,7 +403,7 @@ def create_interactive_plot():
             title_standoff=40            
         ),
         plot_bgcolor='white',
-        height=500,
+        height=600,
         margin=dict(t=0, b=100, l=0, r=0),
         dragmode=False,  # Disable pan mode
         hovermode='closest',
