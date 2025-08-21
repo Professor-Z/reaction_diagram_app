@@ -336,7 +336,6 @@ def create_interactive_plot():
     
     # Configure layout
     fig.update_layout(
-        xaxis_title=dict(text="Reaction Coordinate", font=dict(size=24, color='black')),
         yaxis_title=dict(text="Potential Energy", font=dict(size=24, color='black')),
         xaxis=dict(
             range=[-1, 11],
@@ -364,9 +363,22 @@ def create_interactive_plot():
         ),
         plot_bgcolor='white',
         height=400,
-        margin=dict(t=0, b=0, l=0, r=0),
+        margin=dict(t=0, b=100, l=0, r=0),
         dragmode=False,  # Disable pan mode
-        hovermode='closest'
+        hovermode='closest',
+        annotations=[
+            dict(
+                x=0.5,  # Center the title horizontally
+                y=-0.05,  # Position the title below the x-axis
+                xref="paper",  # Use relative positioning for x
+                yref="paper",  # Use relative positioning for y
+                text="Reaction Coordinate",  # Title text
+                showarrow=False,  # No arrow
+                font=dict(size=24, color='black'),  # Font settings
+                xanchor="center",  # Center the title horizontally
+                yanchor="top"  # Anchor the title at the top (relative to its position)
+            )
+        ]
     )
     
     return fig
