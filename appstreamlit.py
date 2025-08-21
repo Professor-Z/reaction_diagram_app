@@ -6,6 +6,13 @@ import plotly.express as px
 import json
 
 
+# Set page configuration
+st.set_page_config(
+    page_title="Reaction Coordinate Diagram",
+    page_icon="⚗️",
+    layout="wide",
+)
+
 # Add custom CSS to reduce empty space
 st.markdown(
     """
@@ -47,13 +54,6 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True
-)
-
-# Set page configuration
-st.set_page_config(
-    page_title="Reaction Coordinate Diagram",
-    page_icon="⚗️",
-    layout="wide",
 )
 
 # Initialize session state variables
