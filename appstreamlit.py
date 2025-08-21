@@ -360,7 +360,7 @@ def create_interactive_plot():
             showline=True,
             linewidth=2,
             linecolor='black',
-            title_standoff=40            
+            title_standoff=20            
         ),
         plot_bgcolor='white',
         height=400,
