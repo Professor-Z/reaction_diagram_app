@@ -5,20 +5,7 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 import json
 
-# Add custom CSS to style the slider titles
-st.markdown(
-    """
-    <style>
-    .stSlider label {
-        font-size: 20px !important;  /* Larger text size */
-        font-weight: bold !important;  /* Bold text */
-        color: red !important;  /* Red text color */
-        margin-bottom: 10px !important;  /* Add spacing below the title */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+
 
 
 # Set page configuration
@@ -384,10 +371,25 @@ def create_interactive_plot():
     
     return fig
 
-
+# Add custom CSS to style the slider titles
+st.markdown(
+    """
+    <style>
+    .stSlider label {
+        font-size: 20px !important;  /* Larger text size */
+        font-weight: bold !important;  /* Bold text */
+        color: red !important;  /* Red text color */
+        margin-bottom: 10px !important;  /* Add spacing below the title */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Main app
 st.title("Interactive Reaction Coordinate Diagram")
+
+
 
 # Energy control sliders in the sidebar
 st.sidebar.header("⚙️ Control Options")
