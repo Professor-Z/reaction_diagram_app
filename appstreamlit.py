@@ -363,13 +363,27 @@ def create_interactive_plot():
             title_standoff=40            
         ),
         plot_bgcolor='white',
-        height=700,
+        height=500,
         margin=dict(t=0, b=0, l=0, r=0),
         dragmode=False,  # Disable pan mode
         hovermode='closest'
     )
     
     return fig
+
+
+# Add custom CSS to adjust the sidebar width
+st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"] {
+        width: 500px !important;  /* Adjust the width as needed */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Add custom CSS to style the slider titles
 st.markdown(
@@ -388,8 +402,6 @@ st.markdown(
 
 # Main app
 st.title("Interactive Reaction Coordinate Diagram")
-
-
 
 # Energy control sliders in the sidebar
 st.sidebar.header("⚙️ Control Options")
