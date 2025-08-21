@@ -35,7 +35,7 @@ st.markdown(
     }
 
     /* Remove padding from the sidebar */
-    .stSidebar {
+    .stSidebar > div:first-child {
         padding-top: 0 !important;
         margin-top: 0 !important;
     }
@@ -47,7 +47,7 @@ st.markdown(
     }
 
     /* Remove padding from the root container */
-    #root {
+    .stSidebar > div:last-child {
         padding-top: 0 !important;
         margin-top: 0 !important;
     }
