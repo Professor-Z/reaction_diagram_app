@@ -6,7 +6,48 @@ import plotly.express as px
 import json
 
 
+# Add custom CSS to reduce empty space
+st.markdown(
+    """
+    <style>
+    /* Remove padding and margin from the page title */
+    h1 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
 
+    /* Remove padding from the main container */
+    .stApp > div {
+        padding-top: 0 !important;
+    }
+
+    /* Remove padding from the header */
+    .stApp > header {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Remove padding from the sidebar */
+    .stSidebar {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Remove padding from the block container */
+    .block-container {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Remove padding from the root container */
+    #root {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Set page configuration
 st.set_page_config(
