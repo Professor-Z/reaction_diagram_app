@@ -5,6 +5,22 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 import json
 
+# Add custom CSS to style the slider titles
+st.markdown(
+    """
+    <style>
+    .stSlider label {
+        font-size: 20px !important;  /* Larger text size */
+        font-weight: bold !important;  /* Bold text */
+        color: red !important;  /* Red text color */
+        margin-bottom: 10px !important;  /* Add spacing below the title */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Set page configuration
 st.set_page_config(
     page_title="Reaction Coordinate Diagram",
@@ -227,7 +243,7 @@ def create_interactive_plot():
             marker=dict(size=15, color='blue', line=dict(width=2, color='darkblue')),
             text=['REACTANT'],
             textposition='top center',
-            textfont=dict(size=12, color='blue'),
+            textfont=dict(size=20, color='blue'),
             name='Reactant',
             showlegend=False,
             customdata=['reactant'],
@@ -240,8 +256,8 @@ def create_interactive_plot():
             mode='markers+text',
             marker=dict(size=15, color='red', line=dict(width=2, color='darkred')),
             text=['PRODUCT'],
-            textposition='bottom center',
-            textfont=dict(size=12, color='red'),
+            textposition='top center',
+            textfont=dict(size=20, color='red'),
             name='Product',
             showlegend=False,
             customdata=['product'],
@@ -256,7 +272,7 @@ def create_interactive_plot():
             marker=dict(size=15, color=ts_color, line=dict(width=2, color='purple')),
             text=['TRANSITION STATE'],
             textposition='top center',
-            textfont=dict(size=12, color=ts_color),
+            textfont=dict(size=20, color=ts_color),
             name='Transition State',
             showlegend=False,
             customdata=['transition_state'],
@@ -334,20 +350,19 @@ def create_interactive_plot():
     
     # Configure layout
     fig.update_layout(
-        title=dict(
-            text="Interactive Reaction Coordinate Diagram",
-            font=dict(size=24),
-            x=0.5
-        ),
-        xaxis_title=dict(text="Reaction Coordinate", font=dict(size=16)),
-        yaxis_title=dict(text="Energy", font=dict(size=16)),
+        xaxis_title=dict(text="Reaction Coordinate", font=dict(size=24, color='black')),
+        yaxis_title=dict(text="Potential Energy", font=dict(size=24, color='black')),
         xaxis=dict(
             range=[-1, 11],
             showgrid=True,
             gridcolor='lightgray',
             gridwidth=0.5,
             dtick=1,
-            showticklabels=False  # Hide tick labels like original
+            showticklabels=False,  # Hide tick labels like original
+            showline=True,
+            linewidth=2,
+            linecolor='black',
+            title_standoff=40
         ),
         yaxis=dict(
             range=[4, 18],
@@ -355,107 +370,108 @@ def create_interactive_plot():
             gridcolor='lightgray',
             gridwidth=0.5,
             dtick=1,
-            showticklabels=False  # Hide tick labels like original
+            showticklabels=False,  # Hide tick labels like original
+            showline=True,
+            linewidth=2,
+            linecolor='black',
+            title_standoff=40            
         ),
         plot_bgcolor='white',
         height=700,
-        margin=dict(t=100, b=100, l=100, r=100),
+        margin=dict(t=0, b=0, l=0, r=0),
         dragmode=False,  # Disable pan mode
         hovermode='closest'
     )
     
     return fig
 
+
+
 # Main app
-st.title("⚗️ Interactive Reaction Coordinate Diagram")
-
-# Instructions
-st.markdown("""
-**Instructions:** Adjust the energy values using the sliders below, then view the reaction coordinate diagram. 
-Use the control buttons below the graph to toggle different features and save curves for comparison.
-""")
+st.title("Interactive Reaction Coordinate Diagram")
 
 # Energy control sliders in the sidebar
-with st.sidebar:
-    st.markdown("### Energy Controls")
+st.sidebar.header("⚙️ Control Options")
 
-# Energy control sliders in the sidebar
-with st.sidebar:
-    st.markdown("### Energy Controls")
-    
-    if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
-        new_reactant = st.slider(
-            "Reactant Energy",
-            min_value=4.0,
-            max_value=18.0,
-            value=float(st.session_state.reactant_energy),
-            step=0.1,
-            key="reactant_slider"
-        )
-        if new_reactant != st.session_state.reactant_energy:
-            st.session_state.reactant_energy = new_reactant
-            update_hammond_postulate()
-            st.rerun()
-    else:
-        st.write(f"Reactant Energy: {st.session_state.reactant_energy:.1f} (Fixed in mode)")
-
-    if st.session_state.endothermic_mode:
-        new_product = st.slider(
-            "Product Energy",
-            min_value=float(st.session_state.reactant_energy),
-            max_value=18.0,
-            value=float(st.session_state.product_energy),
-            step=0.1,
-            key="product_slider_endo"
-        )
-    elif st.session_state.exothermic_mode:
-        new_product = st.slider(
-            "Product Energy",
-            min_value=4.0,
-            max_value=float(st.session_state.reactant_energy),
-            value=float(st.session_state.product_energy),
-            step=0.1,
-            key="product_slider_exo"
-        )
-    else:
-        new_product = st.slider(
-            "Product Energy",
-            min_value=4.0,
-            max_value=18.0,
-            value=float(st.session_state.product_energy),
-            step=0.1,
-            key="product_slider_default"
-        )
-    
-    if new_product != st.session_state.product_energy:
-        st.session_state.product_energy = new_product
-        
-        # Update peak energy based on mode
-        if st.session_state.endothermic_mode:
-            st.session_state.peak_y = ENDOTHERMIC_PEAK_ENERGY + (st.session_state.product_energy - ENDOTHERMIC_PRODUCT_ENERGY) * 1.1
-        elif st.session_state.exothermic_mode:
-            delta_E = st.session_state.reactant_energy - st.session_state.product_energy
-            k = 0.15
-            st.session_state.peak_y = st.session_state.reactant_energy + (EXOTHERMIC_PEAK_ENERGY - EXOTHERMIC_REACTANT_ENERGY) * np.exp(-k * delta_E)
-        
+# Reactant Energy Slider
+if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
+    new_reactant = st.sidebar.slider(
+        "🔵 Reactant Energy",
+        min_value=4.5,
+        max_value=float(st.session_state.peak_y),  # Limit to TS energy
+        value=float(st.session_state.reactant_energy),
+        step=0.1,
+        key="reactant_slider"
+    )
+    if new_reactant != st.session_state.reactant_energy:
+        st.session_state.reactant_energy = new_reactant
+        # Keep reactant below TS
+        st.session_state.reactant_energy = min(st.session_state.reactant_energy, st.session_state.peak_y)
         update_hammond_postulate()
         st.rerun()
+else:
+    st.sidebar.write(f"🔵 Reactant Energy: FIXED")
 
-    if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
-        min_peak = max(st.session_state.reactant_energy, st.session_state.product_energy) + 0.1
-        new_peak = st.slider(
-            "Transition State Energy",
-            min_value=float(min_peak),
-            max_value=18.0,
-            value=float(st.session_state.peak_y),
-            step=0.1,
-            key="peak_slider"
-        )
-        if new_peak != st.session_state.peak_y:
-            st.session_state.peak_y = new_peak
-            st.rerun()
-    else:
-        st.write(f"TS Energy: {st.session_state.peak_y:.1f} (Auto-adjusted in mode)")
+# Transition State Energy Slider
+if not (st.session_state.endothermic_mode or st.session_state.exothermic_mode):
+    min_peak = max(st.session_state.reactant_energy, st.session_state.product_energy) + 0.1
+    new_peak = st.sidebar.slider(
+        "🟣 Transition State Energy",
+        min_value=float(min_peak),
+        max_value=17.0,
+        value=float(st.session_state.peak_y),
+        step=0.1,
+        key="peak_slider"
+    )
+    if new_peak != st.session_state.peak_y:
+        st.session_state.peak_y = new_peak
+        st.rerun()
+else:
+    st.sidebar.write(f"🟣 Transition State Energy: Auto-adjusted based on Hammond's Postulate")
+
+# Product Energy Slider
+if st.session_state.endothermic_mode:
+    new_product = st.sidebar.slider(
+        "🔴 Product Energy",
+        min_value=float(st.session_state.reactant_energy),
+        max_value=17.0,
+        value=float(st.session_state.product_energy),
+        step=0.1,
+        key="product_slider_endo"
+    )
+elif st.session_state.exothermic_mode:
+    new_product = st.sidebar.slider(
+        "🔴 Product Energy",
+        min_value=4.5,
+        max_value=float(st.session_state.reactant_energy),
+        value=float(st.session_state.product_energy),
+        step=0.1,
+        key="product_slider_exo"
+    )
+else:
+    new_product = st.sidebar.slider(
+        "🔴 Product Energy",
+        min_value=4.5,
+        max_value=float(st.session_state.peak_y),
+        value=float(st.session_state.product_energy),
+        step=0.1,
+        key="product_slider_default"
+    )
+    
+if new_product != st.session_state.product_energy:
+    st.session_state.product_energy = new_product
+    
+    # Update peak energy based on mode
+    if st.session_state.endothermic_mode:
+        st.session_state.peak_y = ENDOTHERMIC_PEAK_ENERGY + (st.session_state.product_energy - ENDOTHERMIC_PRODUCT_ENERGY) * 1.1
+    elif st.session_state.exothermic_mode:
+        delta_E = st.session_state.reactant_energy - st.session_state.product_energy
+        k = 0.15
+        st.session_state.peak_y = st.session_state.reactant_energy + (EXOTHERMIC_PEAK_ENERGY - EXOTHERMIC_REACTANT_ENERGY) * np.exp(-k * delta_E)
+    
+    update_hammond_postulate()
+    st.rerun()
+
 
 # Create and display the interactive plot
 fig = create_interactive_plot()
@@ -464,43 +480,16 @@ fig = create_interactive_plot()
 st.plotly_chart(fig, use_container_width=True)
 
 
-# Custom CSS to adjust sidebar width
-st.markdown(
-    """
-    <style>
-    .stSidebar {
-        width: 300px; /* Adjust the width as needed */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Reaction Modes: Buttons side by side in the sidebar
+st.sidebar.markdown("**Reaction Modes:**")
 
+# Create columns within the sidebar for the buttons
+cols = st.sidebar.columns(2)  # 2 columns for 2 buttons
 
-# Control buttons in columns
-col1, col2, col3, col4, col5 = st.columns(5)
-
-with col1:
-    ea_button_color = "🟢" if st.session_state.show_ea else "⚪"
-    if st.button(f"{ea_button_color} Show/Hide Ea"):
-        st.session_state.show_ea = not st.session_state.show_ea
-        st.rerun()
-
-with col2:
-    deltaH_button_color = "🟠" if st.session_state.show_deltaH else "⚪"
-    if st.button(f"{deltaH_button_color} Show/Hide ΔH"):
-        st.session_state.show_deltaH = not st.session_state.show_deltaH
-        st.rerun()
-
-with col3:
-    labels_button_color = "🟣" if st.session_state.show_labels else "⚪"
-    if st.button(f"{labels_button_color} Show/Hide Labels"):
-        st.session_state.show_labels = not st.session_state.show_labels
-        st.rerun()
-
-with col4:
-    endo_button_color = "🔵" if st.session_state.endothermic_mode else "⚪"
-    if st.button(f"{endo_button_color} Endothermic Mode"):
+# Button for Endothermic Mode
+with cols[0]:
+    endo_button_color = "❄️" if st.session_state.endothermic_mode else "⚪"
+    if st.button(f"{endo_button_color} Endothermic", help="Click here to show/hide an endothermic reaction"):
         st.session_state.endothermic_mode = not st.session_state.endothermic_mode
         if st.session_state.endothermic_mode:
             st.session_state.exothermic_mode = False
@@ -514,9 +503,10 @@ with col4:
         update_hammond_postulate()
         st.rerun()
 
-with col5:
-    exo_button_color = "🔴" if st.session_state.exothermic_mode else "⚪"
-    if st.button(f"{exo_button_color} Exothermic Mode"):
+# Button for Exothermic Mode
+with cols[1]:
+    exo_button_color = "🔥" if st.session_state.exothermic_mode else "⚪"
+    if st.button(f"{exo_button_color} Exothermic", help="Click here to show/hide an exothermic reaction"):
         st.session_state.exothermic_mode = not st.session_state.exothermic_mode
         if st.session_state.exothermic_mode:
             st.session_state.endothermic_mode = False
@@ -530,11 +520,38 @@ with col5:
         update_hammond_postulate()
         st.rerun()
 
-# Additional control buttons
-col6, col7, col8 = st.columns([1, 1, 2])
+# Toggle Features
+st.sidebar.markdown("**Display:**")
 
-with col6:
-    if st.button("💾 Save Curve"):
+# Create columns within the sidebar for the checkboxes
+cols = st.sidebar.columns(3)  # 3 columns for 3 checkboxes
+
+# Checkbox for Activation Energy (Ea)
+with cols[0]:
+    show_ea = st.checkbox("Ea", value=st.session_state.show_ea, help="Click here to show/hide the activation energy (Ea)")
+    if show_ea != st.session_state.show_ea:
+        st.session_state.show_ea = show_ea
+        st.rerun()
+
+# Checkbox for Enthalpy Change (ΔH)
+with cols[1]:
+    show_deltaH = st.checkbox("ΔH", value=st.session_state.show_deltaH, help="Click here to show/hide the change in enthalpy (ΔH)")
+    if show_deltaH != st.session_state.show_deltaH:
+        st.session_state.show_deltaH = show_deltaH
+        st.rerun()
+
+# Checkbox for Labels
+with cols[2]:
+    show_labels = st.checkbox("Labels", value=st.session_state.show_labels, help="Click here to show/hide labels for the reactant, transition state and product")
+    if show_labels != st.session_state.show_labels:
+        st.session_state.show_labels = show_labels
+        st.rerun()
+
+# Curve Management: All buttons in a single row
+with st.sidebar.container():
+    st.markdown('<div class="responsive-buttons">', unsafe_allow_html=True)
+    
+    if st.button("💾 Save Current Curve"):
         x, y = compute_energy()
         deltaH_value = st.session_state.product_energy - st.session_state.reactant_energy
         curve_color = get_color_for_deltaH(deltaH_value)
@@ -544,57 +561,34 @@ with col6:
             'y': y.tolist(),
             'color': curve_color
         })
-        st.success(f"Curve saved! Total saved: {len(st.session_state.saved_curves)}")
+        st.sidebar.success("Curve saved!")
         st.rerun()
 
-with col7:
-    if st.button("🗑️ Clear All Curves"):
+    if st.button("🗑️ Clear All Saved Curves"):
         st.session_state.saved_curves = []
-        st.success("All saved curves cleared!")
+        st.sidebar.success("Graph cleared!")
         st.rerun()
 
-with col8:
-    if len(st.session_state.saved_curves) > 0:
-        st.info(f"📊 {len(st.session_state.saved_curves)} curve(s) saved")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# Display current values
-st.markdown("### Current Energy Values")
-info_col1, info_col2, info_col3, info_col4 = st.columns(4)
-
-with info_col1:
-    st.metric("Reactant Energy", f"{st.session_state.reactant_energy:.1f}")
-
-with info_col2:
-    st.metric("Product Energy", f"{st.session_state.product_energy:.1f}")
-
-with info_col3:
-    st.metric("Transition State Energy", f"{st.session_state.peak_y:.1f}")
-
-with info_col4:
-    delta_h = st.session_state.product_energy - st.session_state.reactant_energy
-    st.metric("ΔH", f"{delta_h:.1f}", 
-              delta=f"{'Endothermic' if delta_h > 0 else 'Exothermic' if delta_h < 0 else 'No change'}")
 
 # Help section
-with st.expander("ℹ️ Help & Features"):
+with st.expander("ℹ️ Features & Instructions"):
     st.markdown("""
-    **This interactive tool demonstrates:**
-    - **Energy profiles** of chemical reactions
-    - **Activation energy (Ea)** - energy barrier for the reaction
-    - **Enthalpy change (ΔH)** - overall energy difference
-    - **Hammond's postulate** - transition state position shifts with reaction favorability
-    - **Endothermic vs Exothermic** reaction types
+                
+    This interactive reaction coordinate diagram illustrates key concepts in chemical reaction energetics. Visualize how the potential energy of a system changes along the reaction pathway, highlighting the reactant, transition state, product, activation energy and change in enthalpy. 
+    - **Activation Energy (Ea):** The energy barrier that must be overcome for the reaction to proceed, which corresponds to the difference in energy between the transition state and the reactant. Adjust the transition state or reactant energies and watch how the activation energy changes. 
+    - **Enthalpy change (ΔH):** The overall energy difference between the products and reactants. A positive ΔH indicates an endothermic treaction (absorbs energy), while a negative ΔH indicates an exothermic reaction (releases energy). Change reaction modes to constrain the diagram to an endothermic or exothermic reaction. 
+    - **Hammond's Postulate:** The structure of the transition state resembles the structure of the species (reactant or product) that is closest to it in energy. If a transition state is closer in energy to the reactants, it will structurally resemble the reactants more than the products, and vice versa. As the reactant and product energies are adjusted in this reaction coordinate diagram, notice how both the horizontal position and color of the transition state change to align with Hammond's postulate. 
+
     
     **Controls:**
-    - **Drag the colored circles** to adjust energies (when available)
-    - **Toggle buttons** to show/hide different features
-    - **Mode buttons** to switch between reaction types
-    - **Save curves** to compare different reaction profiles
-    
-    **Colors:**
-    - Blue: Reactant state
-    - Red: Product state  
-    - Purple/Dynamic: Transition state (color changes with position)
-    - Green: Activation energy (Ea)
-    - Orange: Enthalpy change (ΔH)
-    """)
+    - Adjust the reactant, transition state or product energies, and watch how the coordinate diagram changes.
+    - Select "Endothermic" or "Exothermic" mode to force the reaction to have a positive or negative ΔH value, respectively. 
+    - Check boxes can be used to show or hide the activation energy, change in enthalpy and labels for the reactant, transition state and product.
+    - Click "Save Current Curve" to store the current curve on the graph; the color of the saved curve will change as ΔH changes. If the "SHIFT" key is depressed as the "Save Current Curve" button is clicked, the curve will be saved with the activation energy labeled.
+    - Click "Clear All Saved Curves" to remove all previously saved curves from the diagram. 
+                
+
+    """
+    )
