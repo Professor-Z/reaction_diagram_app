@@ -34,12 +34,6 @@ st.markdown(
         margin-top: 0 !important;
     }
 
-    /* Remove padding from the sidebar */
-    .stSidebar > div:first-child {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-
     /* Remove padding from the block container */
     .block-container {
         padding-top: 0 !important;
@@ -55,6 +49,8 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
 
 # Initialize session state variables
 if 'reactant_energy' not in st.session_state:
@@ -237,7 +233,7 @@ def create_interactive_plot():
             x=curve_data['x'],
             y=curve_data['y'],
             mode='lines',
-            line=dict(color=curve_data['color'], width=2),
+            line=dict(color=curve_data['color'], width=8),
             name=f'Saved Curve {i+1}',
             showlegend=False,
             hoverinfo='skip'
@@ -309,11 +305,13 @@ def create_interactive_plot():
     # Add Ea arrow if enabled
     if st.session_state.show_ea:
         x_arrow = st.session_state.peak_x - 0.5
+        y_mid = (st.session_state.reactant_energy + st.session_state.peak_y) / 2
+        st.write("Ea arrow position:", x_arrow, y_mid)
         fig.add_annotation(
             x=x_arrow, y=(st.session_state.reactant_energy + st.session_state.peak_y) / 2,
             text="E<sub>a</sub>",
             showarrow=False,
-            font=dict(color='green', size=16),
+            font=dict(color='green', size=20),
             bgcolor='rgba(255,255,255,0.8)',
             bordercolor='green',
             borderwidth=1
@@ -330,7 +328,7 @@ def create_interactive_plot():
         # Arrow heads
         fig.add_annotation(
             x=x_arrow, y=st.session_state.reactant_energy + 0.2,
-            ax=0, ay=10, arrowhead=2, arrowcolor="green", arrowwidth=2,
+            ax=0, ay=10, xref='x', yref='y', arrowhead=2, arrowcolor="green", arrowwidth=8,
             showarrow=True, text=""
         )
         fig.add_annotation(
@@ -421,7 +419,8 @@ def create_interactive_plot():
             )
         ]
     )
-    
+
+
     return fig
 
 
