@@ -263,7 +263,7 @@ def create_interactive_plot():
         fig.add_trace(go.Scatter(
             x=[0], y=[st.session_state.reactant_energy],
             mode='markers+text',
-            marker=dict(size=15, color='blue', line=dict(width=2, color='darkblue')),
+            marker=dict(size=20, color='blue', line=dict(width=2, color='darkblue')),
             text=['REACTANT'],
             textposition='top center',
             textfont=dict(size=20, color='blue'),
@@ -277,7 +277,7 @@ def create_interactive_plot():
         fig.add_trace(go.Scatter(
             x=[10], y=[st.session_state.product_energy],
             mode='markers+text',
-            marker=dict(size=15, color='red', line=dict(width=2, color='darkred')),
+            marker=dict(size=20, color='red', line=dict(width=2, color='darkred')),
             text=['PRODUCT'],
             textposition='top center',
             textfont=dict(size=20, color='red'),
@@ -292,7 +292,7 @@ def create_interactive_plot():
         fig.add_trace(go.Scatter(
             x=[st.session_state.peak_x], y=[st.session_state.peak_y],
             mode='markers+text',
-            marker=dict(size=15, color=ts_color, line=dict(width=2, color='purple')),
+            marker=dict(size=20, color=ts_color, line=dict(width=2, color='purple')),
             text=['TRANSITION STATE'],
             textposition='top center',
             textfont=dict(size=20, color=ts_color),
@@ -305,13 +305,11 @@ def create_interactive_plot():
     # Add Ea arrow if enabled
     if st.session_state.show_ea:
         x_arrow = st.session_state.peak_x - 0.5
-        y_mid = (st.session_state.reactant_energy + st.session_state.peak_y) / 2
-        st.write("Ea arrow position:", x_arrow, y_mid)
         fig.add_annotation(
             x=x_arrow, y=(st.session_state.reactant_energy + st.session_state.peak_y) / 2,
             text="E<sub>a</sub>",
             showarrow=False,
-            font=dict(color='green', size=20),
+            font=dict(color='green', size=16),
             bgcolor='rgba(255,255,255,0.8)',
             bordercolor='green',
             borderwidth=1
@@ -328,7 +326,7 @@ def create_interactive_plot():
         # Arrow heads
         fig.add_annotation(
             x=x_arrow, y=st.session_state.reactant_energy + 0.2,
-            ax=0, ay=10, xref='x', yref='y', arrowhead=2, arrowcolor="green", arrowwidth=8,
+            ax=0, ay=10, arrowhead=2, arrowcolor="green", arrowwidth=2,
             showarrow=True, text=""
         )
         fig.add_annotation(
@@ -375,18 +373,15 @@ def create_interactive_plot():
     
     # Configure layout
     fig.update_layout(
-        yaxis_title=dict(text="Potential Energy", font=dict(size=24, color='black')),
+        xaxis_title=dict(text="Reaction Coordinate", font=dict(size=24)),
+        yaxis_title=dict(text="Potential Energy", font=dict(size=24)),
         xaxis=dict(
             range=[-1, 11],
             showgrid=True,
             gridcolor='lightgray',
             gridwidth=0.5,
             dtick=1,
-            showticklabels=False,  # Hide tick labels like original
-            showline=True,
-            linewidth=2,
-            linecolor='black',
-            title_standoff=20
+            showticklabels=False  # Hide tick labels like original
         ),
         yaxis=dict(
             range=[4, 18],
@@ -394,34 +389,17 @@ def create_interactive_plot():
             gridcolor='lightgray',
             gridwidth=0.5,
             dtick=1,
-            showticklabels=False,  # Hide tick labels like original
-            showline=True,
-            linewidth=2,
-            linecolor='black',
-            title_standoff=40            
+            showticklabels=False  # Hide tick labels like original
         ),
         plot_bgcolor='white',
-        height=600,
-        margin=dict(t=0, b=100, l=0, r=0),
+        height=700,
+        margin=dict(t=100, b=100, l=100, r=100),
         dragmode=False,  # Disable pan mode
-        hovermode='closest',
-        annotations=[
-            dict(
-                x=0.5,  # Center the title horizontally
-                y=-0.05,  # Position the title below the x-axis
-                xref="paper",  # Use relative positioning for x
-                yref="paper",  # Use relative positioning for y
-                text="Reaction Coordinate",  # Title text
-                showarrow=False,  # No arrow
-                font=dict(size=24, color='black'),  # Font settings
-                xanchor="center",  # Center the title horizontally
-                yanchor="top"  # Anchor the title at the top (relative to its position)
-            )
-        ]
+        hovermode='closest'
     )
-
-
+    
     return fig
+
 
 
 # Add custom CSS to adjust the sidebar width
